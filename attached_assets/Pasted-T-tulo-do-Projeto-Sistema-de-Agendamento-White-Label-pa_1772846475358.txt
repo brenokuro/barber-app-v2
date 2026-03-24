@@ -1,0 +1,77 @@
+Título do Projeto: Sistema de Agendamento White-Label para Barbearia (SAAS Individual)
+
+Descrição Geral:
+Crie uma aplicação full-stack de agendamento de barbearia com foco em exclusividade (o cliente só vê a barbearia em questão). O sistema deve ser dividido em um App Mobile (React Native + Expo) para clientes e uma Interface Web (React) para administração da barbearia.
+1. Arquitetura Técnica
+
+    Backend: Node.js com Express e TypeScript.
+
+    ORM: Prisma com banco de dados PostgreSQL.
+
+    Frontend Mobile: React Native (Expo) focado em Android e iOS.
+
+    Frontend Web: React (Vite/Next.js) para o Dashboard administrativo.
+
+2. Requisitos de Funcionalidades
+
+Fluxo do Cliente (Mobile):
+
+    Agendamento: Seleção de data e hora com base na disponibilidade real.
+
+    Serviços: Listagem de serviços (ex: Cabelo, Barba, Sobrancelha) com preços.
+
+    Assinaturas/Pacotes: Opção de contratar planos (ex: 4 cortes/mês por R$ 120,00).
+
+    Pagamento: Integração de pagamento via PIX ou Cartão diretamente no app.
+
+    Interface: Design limpo, responsivo e que não mostre outros profissionais ou barbearias (rota única).
+
+Fluxo do Barbeiro/Admin (Web & Mobile):
+
+    Cadastro Completo: Nome completo, username, telefone, CPF/CNPJ e endereço.
+
+    Gestão de Agenda: Visualização em grade (Dashboard Web) das reservas.
+
+    Confirmação: Sistema para o barbeiro confirmar ou rejeitar agendamentos.
+
+    Configuração de Preços: Área para criar serviços e pacotes recorrentes.
+
+3. Estrutura de Dados (Prisma Schema)
+
+Certifique-se de criar as seguintes tabelas:
+
+    User (Clientes e Barbeiros).
+
+    Service (Nome, preço, duração).
+
+    Package (Planos mensais/semanais).
+
+    Appointment (Data, hora, status, relação com serviço e cliente).
+
+4. Configuração de Ambiente (.env)
+
+O projeto deve buscar as seguintes variáveis no arquivo .env:
+
+    DATABASE_URL: Link de conexão com o PostgreSQL.
+
+    SERVER_URL: URL base da API.
+
+    PIX_KEY: Chave para recebimentos.
+
+    JWT_SECRET: Para autenticação segura.
+
+    STRIPE_API_KEY (ou similar): Para processamento de pagamentos.
+
+5. Regras de Interface
+
+    O App Mobile deve ser otimizado para telas pequenas e gestos (swipe).
+
+    A Interface Web deve focar em produtividade, permitindo ver a agenda da semana/mês de forma clara.
+
+Por que esta estrutura funciona?
+
+    Isolamento: Ao definir "rota única", a IA entende que não deve haver um "Marketplace", mas sim um app dedicado.
+
+    Escalabilidade: O uso de Prisma + PostgreSQL permite que você gerencie os pacotes de assinatura (1 corte por semana) de forma relacional fácil.
+
+    Segurança: O campo de CPF/CNPJ no cadastro do instrutor garante a validação necessária para o checkout de pagamento.
