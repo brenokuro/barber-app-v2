@@ -93,6 +93,42 @@ export function registerRoutes(app: Express): void {
     res.json(packages);
   });
 
+  app.post("/api/packages", requireAdmin, async (req, res) => {
+    try {
+      const pkg = await storage.createPackage(req.body);
+      res.json(pkg);
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
+  app.put("/api/packages/:id", requireAdmin, async (req, res) => {
+    try {
+      const pkg = await storage.updatePackage(req.params.id, req.body);
+      res.json(pkg);
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
+  app.delete("/api/packages/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deletePackage(req.params.id);
+      res.json({ ok: true });
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
+  app.delete("/api/services/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteService(req.params.id);
+      res.json({ ok: true });
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
   // Appointments
   app.get("/api/appointments", requireAuth, async (req, res) => {
     const user = (req as any).user;

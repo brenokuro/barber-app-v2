@@ -126,11 +126,32 @@ export const storage = {
     return rows[0];
   },
 
-  async getPackages(): Promise<Package[]> {
+  async createPackage(data: { name: string; description?: string; price_cents: number; credits: number; period_days: number }): Promise<Package> {
     const { rows } = await pool.query(
-      `SELECT * FROM packages WHERE active = TRUE ORDER BY price_cents ASC`
+      `INSERT INTO packages (name, description, price_cents, credits, period_days)
+       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [data.name, data.description || null, data.price_cents, data.credits, data.period_days]
     );
-    return rows;
+    return rows[0];
+  },
+
+  async updatePackage(id: string, data: { name?: string; description?: string; price_cents?: number; credits?: number; period_days?: number; active?: boolean }): Promise<Package> {
+    const entries = Object.entries(data).filter(([, v]) => v !== undefined);
+    const fields = entries.map(([k], i) => `${k} = $${i + 2}`).join(", ");
+    const values = entries.map(([, v]) => v);
+    const { rows } = await pool.query(
+      `UPDATE packages SET ${fields} WHERE id = $1 RETURNING *`,
+      [id, ...values]
+    );
+    return rows[0];
+  },
+
+  async deletePackage(id: string): Promise<void> {
+    await pool.query(`DELETE FROM packages WHERE id = $1`, [id]);
+  },
+
+  async deleteService(id: string): Promise<void> {
+    await pool.query(`DELETE FROM services WHERE id = $1`, [id]);
   },
 
   async getAppointments(userId?: string, isAdmin?: boolean): Promise<Appointment[]> {

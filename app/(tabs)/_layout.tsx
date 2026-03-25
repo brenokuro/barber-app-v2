@@ -20,8 +20,14 @@ function NativeTabLayout({ isAdmin }: { isAdmin: boolean }) {
       </NativeTabs.Trigger>
       {isAdmin && (
         <NativeTabs.Trigger name="admin">
-          <Icon sf={{ default: "chart.bar", selected: "chart.bar.fill" }} />
-          <Label>Admin</Label>
+          <Icon sf={{ default: "calendar", selected: "calendar.fill" }} />
+          <Label>Agenda</Label>
+        </NativeTabs.Trigger>
+      )}
+      {isAdmin && (
+        <NativeTabs.Trigger name="admin-manager">
+          <Icon sf={{ default: "gear", selected: "gear.fill" }} />
+          <Label>Gerenciar</Label>
         </NativeTabs.Trigger>
       )}
       <NativeTabs.Trigger name="profile">
@@ -87,6 +93,17 @@ function ClassicTabLayout({ isAdmin }: { isAdmin: boolean }) {
             title: "Admin",
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="bar-chart" size={size} color={color} />
+            ),
+          }}
+        />
+      )}
+      {isAdmin && (
+        <Tabs.Screen
+          name="admin-manager"
+          options={{
+            title: "Gerenciar",
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="settings" size={size} color={color} />
             ),
           }}
         />
