@@ -30,6 +30,16 @@ function NativeTabLayout({ isAdmin }: { isAdmin: boolean }) {
           <Label>Gerenciar</Label>
         </NativeTabs.Trigger>
       )}
+      {isAdmin && (
+        <NativeTabs.Trigger name="loyalty">
+          <Icon sf={{ default: "star", selected: "star.fill" }} />
+          <Label>Fidelidade</Label>
+        </NativeTabs.Trigger>
+      )}
+      <NativeTabs.Trigger name="notifications">
+        <Icon sf={{ default: "bell", selected: "bell.fill" }} />
+        <Label>Notificações</Label>
+      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="profile">
         <Icon sf={{ default: "person", selected: "person.fill" }} />
         <Label>Perfil</Label>
@@ -108,6 +118,26 @@ function ClassicTabLayout({ isAdmin }: { isAdmin: boolean }) {
           }}
         />
       )}
+      {isAdmin && (
+        <Tabs.Screen
+          name="loyalty"
+          options={{
+            title: "Fidelidade",
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="star" size={size} color={color} />
+            ),
+          }}
+        />
+      )}
+      <Tabs.Screen
+        name="notifications"
+        options={{
+          title: "Notificações",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="notifications" size={size} color={color} />
+          ),
+        }}
+      />
       {!isAdmin && (
         <Tabs.Screen
           name="admin"

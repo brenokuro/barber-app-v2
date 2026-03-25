@@ -14,6 +14,7 @@ import * as Haptics from "expo-haptics";
 import { Colors } from "@/constants/colors";
 import { useAuth } from "@/context/auth";
 import { useQuery } from "@tanstack/react-query";
+import { router } from "expo-router";
 
 interface Package {
   id: string;
@@ -80,6 +81,12 @@ export default function ProfileScreen() {
               </View>
             )}
           </View>
+          <Pressable
+            style={styles.editBtn}
+            onPress={() => router.push("/(tabs)/edit-profile")}
+          >
+            <Feather name="edit-2" size={16} color={Colors.gold} />
+          </Pressable>
         </View>
 
         {user?.phone ? (
@@ -228,6 +235,11 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_500Medium",
     fontSize: 11,
     color: Colors.gold,
+  },
+  editBtn: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: Colors.gold + "15",
   },
   infoRow: {
     flexDirection: "row",
