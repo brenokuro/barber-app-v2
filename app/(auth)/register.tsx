@@ -24,6 +24,7 @@ export default function RegisterScreen() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [userType, setUserType] = useState<"client" | "admin">("client");
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -37,10 +38,14 @@ export default function RegisterScreen() {
       setError("Senha deve ter pelo menos 6 caracteres");
       return;
     }
+    if (userType === "admin" && !phone.trim()) {
+      setError("Telefone é obrigatório para barbeiros");
+      return;
+    }
     setError("");
     setLoading(true);
     try {
-      await register(name.trim(), email.trim(), password, phone.trim() || undefined);
+      await register(name.trim(), email.trim(), password, phone.trim() || undefined, userType);
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.replace("/(tabs)");
     } catch (e: any) {
@@ -74,6 +79,48 @@ export default function RegisterScreen() {
         </View>
 
         <View style={styles.form}>
+          <View style={styles.userTypeSection}>
+            <Text style={styles.label}>Eu sou um:</Text>
+            <View style={styles.userTypeOptions}>
+              <Pressable
+                style={[styles.userTypeOption, userType === "client" && styles.userTypeOptionSelected]}
+                onPress={() => setUserType("client")}
+              >
+                <Feather 
+                  name="user" 
+                  size={20} 
+                  color={userType === "client" ? Colors.gold : Colors.textMuted} 
+                />
+                <View>
+                  <Text style={[styles.userTypeTitle, userType === "client" && styles.userTypeTitleSelected]}>
+                    Cliente
+                  </Text>
+                  <Text style={styles.userTypeDesc}>
+                    Quero agendar serviços
+                  </Text>
+                </View>
+              </Pressable>
+              
+              <Pressable
+                style={[styles.userTypeOption, userType === "admin" && styles.userTypeOptionSelected]}
+                onPress={() => setUserType("admin")}
+              >
+                <Feather 
+                  name="scissors" 
+                  size={20} 
+                  color={userType === "admin" ? Colors.gold : Colors.textMuted} 
+                />
+                <View>
+                  <Text style={[styles.userTypeTitle, userType === "admin" && styles.userTypeTitleSelected]}>
+                    Barbeiro
+                  </Text>
+                  <Text style={styles.userTypeDesc}>
+                    Quero oferecer serviços
+                  </Text>
+                </View>
+              </Pressable>
+            </View>
+          </View>
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Nome completo</Text>
             <View style={styles.inputContainer}>
@@ -107,14 +154,16 @@ export default function RegisterScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Telefone (opcional)</Text>
+            <Text style={styles.label}>
+              Telefone {userType === "admin" && <Text style={{ color: Colors.error }}>*</Text>}
+            </Text>
             <View style={styles.inputContainer}>
               <Feather name="phone" size={18} color={Colors.textMuted} style={styles.icon} />
               <TextInput
                 style={styles.input}
                 value={phone}
                 onChangeText={setPhone}
-                placeholder="(11) 99999-9999"
+                placeholder={userType === "admin" ? "(11) 99999-9999" : "(11) 99999-9999 (opcional)"}
                 placeholderTextColor={Colors.textMuted}
                 keyboardType="phone-pad"
               />
@@ -201,6 +250,41 @@ const styles = StyleSheet.create({
   },
   form: {
     gap: 16,
+  },
+  userTypeSection: {
+    gap: 12,
+    marginBottom: 8,
+  },
+  userTypeOptions: {
+    gap: 12,
+  },
+  userTypeOption: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: Colors.card,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    padding: 16,
+    gap: 12,
+  },
+  userTypeOptionSelected: {
+    backgroundColor: Colors.gold + "15",
+    borderColor: Colors.gold,
+  },
+  userTypeTitle: {
+    fontFamily: "Inter_600SemiBold",
+    fontSize: 16,
+    color: Colors.text,
+    marginBottom: 2,
+  },
+  userTypeTitleSelected: {
+    color: Colors.gold,
+  },
+  userTypeDesc: {
+    fontFamily: "Inter_400Regular",
+    fontSize: 13,
+    color: Colors.textMuted,
   },
   inputGroup: {
     gap: 6,

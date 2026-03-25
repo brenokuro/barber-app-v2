@@ -56,13 +56,13 @@ export interface Appointment {
 }
 
 export const storage = {
-  async register(name: string, email: string, password: string, phone?: string): Promise<User> {
+  async register(name: string, email: string, password: string, phone?: string, role: "client" | "admin" = "client"): Promise<User> {
     const hash = await bcrypt.hash(password, 10);
     const { rows } = await pool.query(
       `INSERT INTO users (name, email, phone, password_hash, role)
-       VALUES ($1, $2, $3, $4, 'client')
+       VALUES ($1, $2, $3, $4, $5)
        RETURNING id, name, email, phone, role, created_at`,
-      [name, email, phone || null, hash]
+      [name, email, phone || null, hash, role]
     );
     return rows[0];
   },

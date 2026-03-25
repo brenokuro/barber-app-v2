@@ -29,11 +29,11 @@ export function registerRoutes(app: Express): void {
   // Auth
   app.post("/api/auth/register", async (req, res) => {
     try {
-      const { name, email, password, phone } = req.body;
+      const { name, email, password, phone, role = "client" } = req.body;
       if (!name || !email || !password) {
         return res.status(400).json({ message: "Campos obrigatórios: nome, email, senha" });
       }
-      const user = await storage.register(name, email, password, phone);
+      const user = await storage.register(name, email, password, phone, role);
       const session = await storage.login(email, password);
       res.json({ user, token: session?.token });
     } catch (e: any) {
