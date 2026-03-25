@@ -42,6 +42,14 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {
+        "origin": "https://vercel.app"
+      },
+      "eas": {
+        "projectId": "f01fe94e-ead6-49b8-b1a5-05eff61d66de"
+      }
     }
   }
 }
