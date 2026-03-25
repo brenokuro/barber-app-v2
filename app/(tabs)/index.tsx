@@ -24,6 +24,74 @@ interface Service {
   duration_minutes: number;
 }
 
+interface LoyaltyData {
+  enabled: boolean;
+  visits_required: number;
+  current_visits: number;
+  reward_type: "free_cut" | "discount";
+  discount_percentage?: number;
+}
+
+function LoyaltyWidget() {
+  const { user } = useAuth();
+
+  // Mock data - substituir com API real
+  const { data: loyalty } = useQuery<LoyaltyData>({
+    queryKey: ["loyalty"],
+    queryFn: async () => ({
+      enabled: true,
+      visits_required: 5,
+      current_visits: 3,
+      reward_type: "free_cut",
+    }),
+  });
+
+  if (!loyalty?.enabled || user?.role === "admin") {
+    return null;
+  }
+
+  const progress = (loyalty.current_visits / loyalty.visits_required) * 100;
+  const remaining = loyalty.visits_required - loyalty.current_visits;
+
+  return (
+    <View style={styles.loyaltyWidget}>
+      <View style={styles.loyaltyHeader}>
+        <View style={styles.loyaltyIcon}>
+          <Feather name="star" size={20} color={Colors.gold} />
+        </View>
+        <View style={styles.loyaltyTitle}>
+          <Text style={styles.loyaltyTitleText}>Programa de Fidelidade</Text>
+          <Text style={styles.loyaltySubtitle}>
+            {remaining === 0 
+              ? "Você ganhou uma recompensa! 🎉" 
+              : `Faltam ${remaining} cortes para seu prêmio`
+            }
+          </Text>
+        </View>
+      </View>
+      
+      <View style={styles.progressContainer}>
+        <View style={styles.progressBar}>
+          <View style={[styles.progressFill, { width: `${progress}%` }]} />
+        </View>
+        <Text style={styles.progressText}>
+          {loyalty.current_visits} / {loyalty.visits_required}
+        </Text>
+      </View>
+      
+      <View style={styles.rewardInfo}>
+        <Feather name="gift" size={14} color={Colors.gold} />
+        <Text style={styles.rewardText}>
+          {loyalty.reward_type === "free_cut" 
+            ? "Corte Grátis" 
+            : `${loyalty.discount_percentage}% de desconto`
+          }
+        </Text>
+      </View>
+    </View>
+  );
+}
+
 function formatPrice(cents: number) {
   return `R$ ${(cents / 100).toFixed(2).replace(".", ",")}`;
 }
@@ -99,6 +167,9 @@ export default function HomeScreen() {
             <Feather name="award" size={40} color={Colors.gold + "40"} />
           </View>
         </View>
+
+        {/* Widget de Fidelidade */}
+        <LoyaltyWidget />
 
         <Text style={styles.sectionTitle}>Serviços disponíveis</Text>
 
@@ -347,5 +418,76 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_400Regular",
     fontSize: 14,
     color: Colors.textSecondary,
+  },
+  loyaltyWidget: {
+    backgroundColor: Colors.card,
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: Colors.gold + "30",
+    marginBottom: 20,
+  },
+  loyaltyHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    marginBottom: 12,
+  },
+  loyaltyIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Colors.gold + "15",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loyaltyTitle: {
+    flex: 1,
+  },
+  loyaltyTitleText: {
+    fontFamily: "Inter_600SemiBold",
+    fontSize: 16,
+    color: Colors.text,
+  },
+  loyaltySubtitle: {
+    fontFamily: "Inter_400Regular",
+    fontSize: 13,
+    color: Colors.textMuted,
+    marginTop: 2,
+  },
+  progressContainer: {
+    marginBottom: 12,
+  },
+  progressBar: {
+    height: 8,
+    backgroundColor: Colors.border,
+    borderRadius: 4,
+    overflow: "hidden",
+    marginBottom: 4,
+  },
+  progressFill: {
+    height: "100%",
+    backgroundColor: Colors.gold,
+    borderRadius: 4,
+  },
+  progressText: {
+    fontFamily: "Inter_500Medium",
+    fontSize: 12,
+    color: Colors.textMuted,
+    textAlign: "center",
+  },
+  rewardInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    backgroundColor: Colors.gold + "10",
+    padding: 8,
+    borderRadius: 8,
+    alignSelf: "flex-start",
+  },
+  rewardText: {
+    fontFamily: "Inter_500Medium",
+    fontSize: 12,
+    color: Colors.gold,
   },
 });

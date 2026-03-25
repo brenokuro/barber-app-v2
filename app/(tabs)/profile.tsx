@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,9 @@ import {
   Pressable,
   Alert,
   Platform,
+  Modal,
+  TextInput,
+  ActivityIndicator,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
@@ -14,7 +17,6 @@ import * as Haptics from "expo-haptics";
 import { Colors } from "@/constants/colors";
 import { useAuth } from "@/context/auth";
 import { useQuery } from "@tanstack/react-query";
-import { router } from "expo-router";
 
 interface Package {
   id: string;
@@ -33,23 +35,77 @@ export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const { user, logout } = useAuth();
   const topPad = Platform.OS === "web" ? 67 : insets.top;
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editName, setEditName] = useState(user?.name || "");
+  const [editPhone, setEditPhone] = useState(user?.phone || "");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const { data: packages } = useQuery<Package[]>({
     queryKey: ["/api/packages"],
   });
 
   const handleLogout = () => {
-    Alert.alert("Sair", "Deseja sair da sua conta?", [
+    Alert.alert("Sair", "Tem certeza que deseja sair?", [
       { text: "Cancelar", style: "cancel" },
       {
         text: "Sair",
         style: "destructive",
-        onPress: async () => {
-          await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-          await logout();
+        onPress: () => {
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          logout();
         },
       },
     ]);
+  };
+
+  const handleSaveProfile = async () => {
+    if (!editName.trim()) {
+      Alert.alert("Erro", "Nome é obrigatório");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Mock API call - substituir com API real
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      Alert.alert("Sucesso", "Perfil atualizado com sucesso!");
+      setShowEditModal(false);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch (error) {
+      Alert.alert("Erro", "Não foi possível atualizar o perfil");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (!currentPassword || !newPassword) {
+      Alert.alert("Erro", "Preencha todos os campos de senha");
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      Alert.alert("Erro", "A senha deve ter pelo menos 6 caracteres");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Mock API call - substituir com API real
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      Alert.alert("Sucesso", "Senha alterada com sucesso!");
+      setCurrentPassword("");
+      setNewPassword("");
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch (error) {
+      Alert.alert("Erro", "Não foi possível alterar a senha");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -83,7 +139,7 @@ export default function ProfileScreen() {
           </View>
           <Pressable
             style={styles.editBtn}
-            onPress={() => router.push("/(tabs)/edit-profile")}
+            onPress={() => setShowEditModal(true)}
           >
             <Feather name="edit-2" size={16} color={Colors.gold} />
           </Pressable>
@@ -131,7 +187,7 @@ export default function ProfileScreen() {
         <View style={styles.menuCard}>
           <Pressable
             style={({ pressed }) => [styles.menuItem, pressed && { opacity: 0.7 }]}
-            onPress={() => Alert.alert("Em breve", "Edição de perfil disponível em breve")}
+            onPress={() => setShowEditModal(true)}
           >
             <Feather name="edit-2" size={18} color={Colors.textSecondary} />
             <Text style={styles.menuLabel}>Editar perfil</Text>
@@ -156,6 +212,101 @@ export default function ProfileScreen() {
           </Pressable>
         </View>
       </ScrollView>
+
+      {/* Modal de Edição */}
+      <Modal
+        visible={showEditModal}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowEditModal(false)}
+      >
+        <View style={[styles.modalContainer, { paddingTop: insets.top }]}>
+          <View style={styles.modalHeader}>
+            <Pressable onPress={() => setShowEditModal(false)}>
+              <Feather name="x" size={24} color={Colors.text} />
+            </Pressable>
+            <Text style={styles.modalTitle}>Editar Perfil</Text>
+            <View style={{ width: 24 }} />
+          </View>
+
+          <ScrollView style={styles.modalContent}>
+            <View style={styles.formSection}>
+              <Text style={styles.formSectionTitle}>Informações Pessoais</Text>
+              
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Nome</Text>
+                <TextInput
+                  style={styles.input}
+                  value={editName}
+                  onChangeText={setEditName}
+                  placeholder="Seu nome"
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Telefone</Text>
+                <TextInput
+                  style={styles.input}
+                  value={editPhone}
+                  onChangeText={setEditPhone}
+                  placeholder="(00) 00000-0000"
+                  keyboardType="phone-pad"
+                />
+              </View>
+
+              <Pressable
+                style={[styles.saveBtn, isLoading && { opacity: 0.7 }]}
+                onPress={handleSaveProfile}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <ActivityIndicator color={Colors.black} size="small" />
+                ) : (
+                  <Text style={styles.saveBtnText}>Salvar Perfil</Text>
+                )}
+              </Pressable>
+            </View>
+
+            <View style={styles.formSection}>
+              <Text style={styles.formSectionTitle}>Alterar Senha</Text>
+              
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Senha Atual</Text>
+                <TextInput
+                  style={styles.input}
+                  value={currentPassword}
+                  onChangeText={setCurrentPassword}
+                  placeholder="Digite sua senha atual"
+                  secureTextEntry
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Nova Senha</Text>
+                <TextInput
+                  style={styles.input}
+                  value={newPassword}
+                  onChangeText={setNewPassword}
+                  placeholder="Digite a nova senha"
+                  secureTextEntry
+                />
+              </View>
+
+              <Pressable
+                style={[styles.saveBtn, isLoading && { opacity: 0.7 }]}
+                onPress={handleChangePassword}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <ActivityIndicator color={Colors.black} size="small" />
+                ) : (
+                  <Text style={styles.saveBtnText}>Alterar Senha</Text>
+                )}
+              </Pressable>
+            </View>
+          </ScrollView>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -345,6 +496,69 @@ const styles = StyleSheet.create({
   menuDivider: {
     height: 1,
     backgroundColor: Colors.border,
-    marginLeft: 48,
+    marginHorizontal: 16,
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  modalTitle: {
+    fontFamily: "Inter_600SemiBold",
+    fontSize: 18,
+    color: Colors.text,
+  },
+  modalContent: {
+    flex: 1,
+    padding: 20,
+  },
+  formSection: {
+    marginBottom: 32,
+  },
+  formSectionTitle: {
+    fontFamily: "Inter_600SemiBold",
+    fontSize: 16,
+    color: Colors.text,
+    marginBottom: 16,
+  },
+  inputGroup: {
+    marginBottom: 16,
+  },
+  inputLabel: {
+    fontFamily: "Inter_500Medium",
+    fontSize: 14,
+    color: Colors.text,
+    marginBottom: 8,
+  },
+  input: {
+    backgroundColor: Colors.card,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    fontFamily: "Inter_400Regular",
+    fontSize: 16,
+    color: Colors.text,
+  },
+  saveBtn: {
+    backgroundColor: Colors.gold,
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: "center",
+    marginTop: 8,
+  },
+  saveBtnText: {
+    fontFamily: "Inter_600SemiBold",
+    fontSize: 16,
+    color: Colors.black,
   },
 });

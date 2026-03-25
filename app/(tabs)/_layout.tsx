@@ -14,28 +14,31 @@ function NativeTabLayout({ isAdmin }: { isAdmin: boolean }) {
         <Icon sf={{ default: "house", selected: "house.fill" }} />
         <Label>Início</Label>
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="appointments">
-        <Icon sf={{ default: "calendar", selected: "calendar.fill" }} />
-        <Label>Agenda</Label>
-      </NativeTabs.Trigger>
-      {isAdmin && (
-        <NativeTabs.Trigger name="admin">
-          <Icon sf={{ default: "calendar", selected: "calendar.fill" }} />
-          <Label>Agenda</Label>
-        </NativeTabs.Trigger>
+      
+      {isAdmin ? (
+        <>
+          <NativeTabs.Trigger name="admin">
+            <Icon sf={{ default: "calendar", selected: "calendar.fill" }} />
+            <Label>Agenda</Label>
+          </NativeTabs.Trigger>
+          <NativeTabs.Trigger name="admin-manager">
+            <Icon sf={{ default: "gear", selected: "gear.fill" }} />
+            <Label>Serviços</Label>
+          </NativeTabs.Trigger>
+        </>
+      ) : (
+        <>
+          <NativeTabs.Trigger name="appointments">
+            <Icon sf={{ default: "calendar", selected: "calendar.fill" }} />
+            <Label>Meus Horários</Label>
+          </NativeTabs.Trigger>
+          <NativeTabs.Trigger name="services">
+            <Icon sf={{ default: "scissors", selected: "scissors.fill" }} />
+            <Label>Serviços</Label>
+          </NativeTabs.Trigger>
+        </>
       )}
-      {isAdmin && (
-        <NativeTabs.Trigger name="admin-manager">
-          <Icon sf={{ default: "gear", selected: "gear.fill" }} />
-          <Label>Gerenciar</Label>
-        </NativeTabs.Trigger>
-      )}
-      {isAdmin && (
-        <NativeTabs.Trigger name="loyalty">
-          <Icon sf={{ default: "star", selected: "star.fill" }} />
-          <Label>Fidelidade</Label>
-        </NativeTabs.Trigger>
-      )}
+      
       <NativeTabs.Trigger name="notifications">
         <Icon sf={{ default: "bell", selected: "bell.fill" }} />
         <Label>Notificações</Label>
@@ -87,48 +90,51 @@ function ClassicTabLayout({ isAdmin }: { isAdmin: boolean }) {
           ),
         }}
       />
-      <Tabs.Screen
-        name="appointments"
-        options={{
-          title: "Agenda",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="calendar" size={size} color={color} />
-          ),
-        }}
-      />
-      {isAdmin && (
-        <Tabs.Screen
-          name="admin"
-          options={{
-            title: "Admin",
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="bar-chart" size={size} color={color} />
-            ),
-          }}
-        />
+      
+      {isAdmin ? (
+        <>
+          <Tabs.Screen
+            name="admin"
+            options={{
+              title: "Agenda",
+              tabBarIcon: ({ color, size }) => (
+                <Ionicons name="calendar" size={size} color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="admin-manager"
+            options={{
+              title: "Serviços",
+              tabBarIcon: ({ color, size }) => (
+                <Ionicons name="settings" size={size} color={color} />
+              ),
+            }}
+          />
+        </>
+      ) : (
+        <>
+          <Tabs.Screen
+            name="appointments"
+            options={{
+              title: "Meus Horários",
+              tabBarIcon: ({ color, size }) => (
+                <Ionicons name="calendar" size={size} color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="services"
+            options={{
+              title: "Serviços",
+              tabBarIcon: ({ color, size }) => (
+                <Ionicons name="cut" size={size} color={color} />
+              ),
+            }}
+          />
+        </>
       )}
-      {isAdmin && (
-        <Tabs.Screen
-          name="admin-manager"
-          options={{
-            title: "Gerenciar",
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="settings" size={size} color={color} />
-            ),
-          }}
-        />
-      )}
-      {isAdmin && (
-        <Tabs.Screen
-          name="loyalty"
-          options={{
-            title: "Fidelidade",
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="star" size={size} color={color} />
-            ),
-          }}
-        />
-      )}
+      
       <Tabs.Screen
         name="notifications"
         options={{
@@ -138,12 +144,6 @@ function ClassicTabLayout({ isAdmin }: { isAdmin: boolean }) {
           ),
         }}
       />
-      {!isAdmin && (
-        <Tabs.Screen
-          name="admin"
-          options={{ href: null }}
-        />
-      )}
       <Tabs.Screen
         name="profile"
         options={{
