@@ -25,7 +25,7 @@ function RootLayoutNav() {
   useEffect(() => {
     if (isLoading) return;
     if (!user) {
-      router.replace("/(auth)/login");
+      router.replace("/(auth)/login-select");
     } else {
       router.replace("/(tabs)");
     }
